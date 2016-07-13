@@ -34,10 +34,9 @@ let proxy = httpProxy.createProxyServer({})
 // 创建 http 服务器
 let server = http.createServer(function(req, res) {
   // 获取域名，方便判断是否代理文件
-  // console.log(url.parse(req.url));
   let hostname = url.parse(req.url).hostname
   if (hostname === 'api.douban.com'){
-    // 获取文件路径
+    // 获取文件路径，如果没有具体路径，则访问 index.html
     let pathname = url.parse(req.url).pathname
     pathname = pathname !== '/' ? pathname : '/index.html'
     let localPath = './dist' + pathname
