@@ -44,14 +44,14 @@ let server = http.createServer(function(req, res) {
     }
 
   }).then(() => {
-
     return fs.statSync(localPath)
 
   }).catch((err) => {
-    
     proxy.web(req, res, { target: req.url });
 
   }).then((stats)=>{
+
+    console.log(req.url); // 对非 api.douban.com 的请求，也会进入这里，具体查看一下问题
 
     return fs.readFileSync(localPath)
 
@@ -63,10 +63,9 @@ let server = http.createServer(function(req, res) {
     res.writeHead(200, {'Content-Type': contentType});
     res.end(file);
 
-    }
-  ).catch((err)=>{
+  }).catch((err)=>{
 
-    console.error(err);
+    // proxy.web(req, res, { target: req.url });
 
   });
 
