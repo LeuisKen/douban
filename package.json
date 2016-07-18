@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "lint": "eslint src douban-proxy.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -21,6 +22,9 @@
     "react": "^15.2.1",
     "react-dom": "^15.2.1"
   },
+  "pre-commit": [
+    "lint"
+  ],
   "devDependencies": {
     "babel-core": "^6.10.4",
     "babel-loader": "^6.2.4",
