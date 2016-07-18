@@ -3,6 +3,7 @@
 let http = require('http'),
     path = require('path'),
     url = require('url'),
+    querystring = require('querystring'),
     fs = require('fs'),
     httpProxy = require('http-proxy')
 
@@ -33,23 +34,34 @@ let server = http.createServer(function(req, res) {
 
   let hostname = url.parse(req.url).hostname,
       pathname = url.parse(req.url).pathname,
-      localPath = `./dist${pathname}`;
+      localPath = `./dist${pathname}`,
+      query = querystring.parse(url.parse(req.url).query).name;
 
-  let serverPromise = new Promise((resolve,reject)=>{
+  let serverRoute = new Promise((resolve,reject)=>{
 
-    if (hostname === 'api.douban.com'){
+    console.log('访问了:'+req.url);
+
+    if (hostname === 'api.douban.com'&&!query){
+
+      console.log('access assets');
       resolve();
+    }else if (hostname === 'api.douban.com'){
+
+      console.log('search books');
+      proxy.web(req,res,{target:'http://api.douban.com/v2/book/search?count=5&q='+ query},(e)=>{
+        if(e) reject(e);
+      });
+
     }else {
-      reject();
+
+      console.log('proxy request');
+      proxy.web(req,res,{target:req.url},(e)=>{
+        if(e) reject(e);
+      })
+
     }
 
-  }).then(() => {
-    return fs.statSync(localPath)
-
-  }).catch((err) => {
-    proxy.web(req, res, { target: req.url });
-
-  }).then((stats)=>{
+  }).then(()=>{
 
     console.log(req.url); // 对非 api.douban.com 的请求，也会进入这里，具体查看一下问题
 
@@ -70,6 +82,8 @@ let server = http.createServer(function(req, res) {
   });
 
 }).listen(3399, function(err){
+
     if(err) throw err;
     console.log("在端口 3399 监听浏览器请求");
+
 })
